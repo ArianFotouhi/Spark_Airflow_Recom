@@ -4,29 +4,49 @@ from airflow.models.dag import DAG
 from airflow.decorators import task
 from airflow.utils.task_group import TaskGroup
 import pandas as pd
+import urllib.request
+import zipfile
+from sklearn.preprocessing import MinMaxScaler
+import pickle
 
 #Extract tasks
 @task()
 def download_data():
-    pass
+    url = "http://files.grouplens.org/datasets/movielens/ml-100k.zip"
+    filename = "movielens.zip"
+    urllib.request.urlretrieve(url, filename)
+    with zipfile.ZipFile(filename, 'r') as zip_ref:
+        zip_ref.extractall()
+    
 
 
 @task()
 def get_data():
-    pass
+    df = pd.read_csv("ml-100k/u.data", sep="\t", header=None, names=["user_id", "item_id", "rating", "timestamp"])
+    with open('/data/file.pickle', 'wb') as f:
+        pickle.dump(df, f)
 
 #Transformation tasks
 @task()
 def missing_val():
-    pass
+    with open('/path/to/shared/file.pickle', 'rb') as f:
+        df = pickle.load(f)
+    df.fillna(df.mean(), inplace=True)
+    return df
 
 @task()
-def normalization():
-    pass
+def normalization(df):
+    scaler = MinMaxScaler()
+    df[["rating"]] = scaler.fit_transform(train[["rating"]])
+    with open('/data/file.pickle', 'wb') as f:
+        pickle.dump(df, f)
+    
 
 #Load
 @task()
 def data_load():
+    with open('/path/to/shared/file.pickle', 'rb') as f:
+        df = pickle.load(f)
     pass
 
 
@@ -64,10 +84,10 @@ with DAG(dag_id="product_etl_dag",schedule_interval="0 9 * * *", start_date=date
 
     with TaskGroup("transform", tooltip="Transform data") as transform:
         
-        transform_srcProductSubcategory = missing_val()
-        transform_srcProductCategory = normalization()
+        miss_val = missing_val()
+        norm_val = normalization(miss_val)
         
-        [transform_srcProductSubcategory, transform_srcProductCategory]
+        [miss_val, norm_val]
 
     with TaskGroup("load", tooltip="Load to model") as load:
         loaded_data = data_load()
