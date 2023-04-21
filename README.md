@@ -10,6 +10,7 @@ If airflow is used for the first time, in terminal create a role:
     --lastname <LASTNAME> \
     --role Admin \
     --email <EMAIL>
+    
 Then users can be seen by
 <br>airflow users list
 
