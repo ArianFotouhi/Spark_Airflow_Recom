@@ -11,7 +11,7 @@ If airflow is used for the first time, in terminal create a role:
     --role Admin \
     --email <EMAIL>
     
-Then users can be seen by
+Then users can be seen by:
 <br>airflow users list
 
 To run the app, go through the directory of app.py then in terminal:
