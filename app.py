@@ -127,7 +127,7 @@ def show_results(predictions):
 
 
 
-with DAG(dag_id="product_etl_dag",schedule_interval="0 9 * * *", start_date=datetime(2022, 3, 5),catchup=False,  tags=["product_model"]) as dag:
+with DAG(dag_id="product_etl_dag",schedule_interval=@daily, start_date=datetime(2023, 4, 22),catchup=False,  tags=["product_model"]) as dag:
 
     with TaskGroup("ETL", tooltip="Extract Transform Load Data") as etl:
         dl_data = download_data()
