@@ -15,7 +15,7 @@ Then users can be seen by:
 <br>airflow users list
 
 Initialize db by:
-airflow db init
+<br>airflow db init
 
 To run the app, go through the directory of app.py then in terminal:
 <br>airflow webserver -p 8080
