@@ -9,6 +9,7 @@ from pyspark.ml.feature import VectorAssembler, StandardScaler
 from pyspark.ml.regression import RandomForestRegressor
 from pyspark.sql.functions import col
 from pyspark.sql import SparkSession
+import pandas as pd
 
 #Extract tasks
 @task()
@@ -26,8 +27,11 @@ def get_data():
 
     data = spark.read.format("csv").option("sep", "\t").option("header", False).load("u.data")
     data = data.select(col("_c0").alias("userId"), col("_c1").alias("itemId"), col("_c2").alias("rating"), col("_c3").alias("timestamp"))
+    data_dict = data.toPandas().to_dict(orient='records')
+
     spark.stop()
-    return data
+    
+    return data_dict
 
 #Transformation tasks
 @task()
@@ -127,7 +131,7 @@ def show_results(predictions):
 
 
 
-with DAG(dag_id="product_etl_dag",schedule_interval="0 0 * * *", start_date=datetime(2023, 4, 22),catchup=False,  tags=["product_model"]) as dag:
+with DAG(dag_id="product_etl_dag",schedule_interval="0 9 * * *", start_date=datetime(2022, 3, 5),catchup=False,  tags=["product_model"]) as dag:
 
     with TaskGroup("ETL", tooltip="Extract Transform Load Data") as etl:
         dl_data = download_data()
